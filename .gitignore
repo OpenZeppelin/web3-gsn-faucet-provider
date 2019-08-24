@@ -70,8 +70,7 @@ build
 .zos.session
 
 
-.openzeppelin/
-
 /web3
 
 .openzeppelin/.session
+.openzeppelin/dev-*
