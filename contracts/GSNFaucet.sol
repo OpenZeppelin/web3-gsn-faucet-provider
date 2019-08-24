@@ -7,11 +7,14 @@ import "@0x/contracts-utils/contracts/src/LibBytes.sol";
 contract GSNFaucet is Initializable, GSNRecipient {
   using LibBytes for bytes;
 
-  uint256 public constant NOT_ENOUGH_WORK = 11;
+  uint256 public constant NOT_ENOUGH_WORK = 1;
   uint256 public constant GRANT = 1e17;
 
   uint256 private difficulty;
   uint256 private lastNonce = 0;
+
+event Proofed(uint256 digest, uint256 diff);
+event Nonced(uint256 nonce);
 
   function initialize(uint256 _difficulty) public initializer {
     GSNRecipient.initialize();
@@ -28,17 +31,23 @@ contract GSNFaucet is Initializable, GSNRecipient {
 
   function checkProof(uint256 nonce) public view returns (bool) {
     bytes32 digest = keccak256(abi.encodePacked(_msgSender(), lastNonce, nonce, address(this)));
-    return uint256(digest) < getDifficulty();
+    // return uint256(digest) < getDifficulty();    
+    return true;
   }
 
   function _preRelayedCall(bytes memory context) internal returns (bytes32) {
     (uint256 proofNonce) = abi.decode(context, (uint256));
-    lastNonce = proofNonce;
+    emit Nonced(proofNonce);
+    // lastNonce = proofNonce;
     return "";
   }
 
-  function gimme(uint256) external {
+  function gimme(uint256 nonce) external {
     require(msg.sender == getHubAddr(), "Must be called from RelayHub");
+    
+    bytes32 digest = keccak256(abi.encodePacked(_msgSender(), lastNonce, nonce, address(this)));
+    emit Proofed(uint256(digest), getDifficulty());
+
     address payable requestor = address(uint160(_msgSender()));
     requestor.transfer(GRANT);
   }
@@ -66,4 +75,5 @@ contract GSNFaucet is Initializable, GSNRecipient {
     return IRelayHub(getHubAddr()).balanceOf(address(this));
   }
 
+  function() payable external { }
 }
