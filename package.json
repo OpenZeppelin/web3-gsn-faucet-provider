@@ -11,9 +11,11 @@
   "dependencies": {
     "@0x/contracts-utils": "^3.2.2",
     "@openzeppelin/contracts-ethereum-package": "^2.2.3",
+    "@openzeppelin/gsn-helpers": "^0.1.9",
     "@openzeppelin/gsn-provider": "^0.1.6",
     "@openzeppelin/upgrades": "^2.5.3",
-    "ethereumjs-wallet": "^0.6.3"
+    "ethereumjs-wallet": "^0.6.3",
+    "web3": "^1.2.0"
   },
   "devDependencies": {
     "@openzeppelin/cli": "^2.5.3",
