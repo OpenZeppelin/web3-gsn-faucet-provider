@@ -1,0 +1,11 @@
+{
+  "name": "web3-gsn-faucet-provider",
+  "version": "0.0.1",
+  "description": "Faucet web3 provider for the GSN",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "OpenZeppelin",
+  "license": "MIT"
+}

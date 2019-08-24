@@ -1,0 +1,7 @@
+{
+  "manifestVersion": "2.2",
+  "contracts": {},
+  "dependencies": {},
+  "name": "web3-gsn-faucet-provider",
+  "version": "0.0.1"
+}
