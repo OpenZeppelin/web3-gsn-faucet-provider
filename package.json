@@ -1,8 +1,8 @@
 {
   "name": "web3-gsn-faucet-provider",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Faucet web3 provider for the GSN",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "./scripts/test.sh"
   },
@@ -12,6 +12,7 @@
     "@0x/contracts-utils": "^3.2.2",
     "@openzeppelin/contracts-ethereum-package": "^2.2.3",
     "@openzeppelin/gsn-helpers": "^0.1.9",
+    "@openzeppelin/gsn-provider": "^0.1.6",
     "@openzeppelin/upgrades": "^2.5.3",
     "web3": "^1.2.0"
   },
