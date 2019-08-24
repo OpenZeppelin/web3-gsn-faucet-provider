@@ -2,8 +2,14 @@ pragma solidity ^0.5.0;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/GSN/GSNRecipient.sol";
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
+import "@0x/contracts-utils/contracts/src/LibBytes.sol";
 
 contract GSNFaucet is Initializable, GSNRecipient {
+  using LibBytes for bytes;
+
+  uint256 public constant NOT_ENOUGH_WORK = 11;
+  uint256 public constant STIPEND = 1e17;
+  
   uint256 private difficulty;
   uint256 private lastNonce = 0;
 
@@ -22,38 +28,38 @@ contract GSNFaucet is Initializable, GSNRecipient {
 
   function checkProof(uint256 nonce) public view returns (bool) {
     bytes32 digest = keccak256(abi.encodePacked(_msgSender(), lastNonce, nonce));
-    require(uint256(digest) < getDifficulty(), "Do more work!");
-    return true;
+    return uint256(digest) < getDifficulty();
   }
 
-  function _preRelayedCall(bytes context) {
-    lastNonce = nonce;
+  function _preRelayedCall(bytes memory context) internal returns (bytes32) {
+    (uint256 proofNonce) = abi.decode(context, (uint256));
+    lastNonce = proofNonce;
+    return "";
   }
 
-  function fooBar(uint256 nonce) public {
-
+  function gimme(uint256) external {
+    require(msg.sender == getHubAddr(), "Must be called from RelayHub");
+    address payable requestor = address(uint160(_msgSender()));
+    requestor.transfer(STIPEND);
   }
 
-  // accept all requests
   function acceptRelayedCall(
-    address relay,
-    address from,
+    address,
+    address,
     bytes calldata encodedFunction,
-    uint256 transactionFee,
-    uint256 gasPrice,
-    uint256 gasLimit,
-    uint256 nonce,
-    bytes calldata approvalData,
-    uint256 maxPossibleCharge
-) external view returns (uint256, bytes memory) {
-    abi.decode();
-    if(this.checkProof()) {
-      return _approveRelayedCall(abi.encodePacked());
+    uint256,
+    uint256,
+    uint256,
+    uint256,
+    bytes calldata,
+    uint256
+  ) external view returns (uint256, bytes memory) {
+    uint256 proofNonce = encodedFunction.readUint256(4);
+    if (this.checkProof(proofNonce)) {
+      return _approveRelayedCall(abi.encodePacked(proofNonce));
     } else {
-
+      return _rejectRelayedCall(NOT_ENOUGH_WORK);
     }
-    // lastNonce = nonce;
-
   }
 
   function getRecipientBalance() public view returns (uint) {

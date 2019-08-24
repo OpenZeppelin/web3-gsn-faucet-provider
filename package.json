@@ -9,6 +9,7 @@
   "author": "OpenZeppelin",
   "license": "MIT",
   "dependencies": {
+    "@0x/contracts-utils": "^3.2.2",
     "@openzeppelin/contracts-ethereum-package": "^2.2.3",
     "@openzeppelin/upgrades": "^2.5.3"
   },
