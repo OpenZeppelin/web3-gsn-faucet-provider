@@ -13,9 +13,6 @@ contract GSNFaucet is Initializable, GSNRecipient {
   uint256 private difficulty;
   uint256 private lastNonce = 0;
 
-event Proofed(uint256 digest, uint256 diff);
-event Nonced(uint256 nonce);
-
   function initialize(uint256 _difficulty) public initializer {
     GSNRecipient.initialize();
     difficulty = _difficulty;
@@ -29,32 +26,26 @@ event Nonced(uint256 nonce);
     return difficulty;
   }
 
-  function checkProof(uint256 nonce) public view returns (bool) {
-    bytes32 digest = keccak256(abi.encodePacked(_msgSender(), lastNonce, nonce, address(this)));
-    // return uint256(digest) < getDifficulty();    
-    return true;
+  function checkProof(address sender, uint256 nonce) internal view returns (bool) {
+    bytes32 digest = keccak256(abi.encodePacked(sender, lastNonce, nonce, address(this)));
+    return (uint256(digest) < getDifficulty());
   }
 
   function _preRelayedCall(bytes memory context) internal returns (bytes32) {
     (uint256 proofNonce) = abi.decode(context, (uint256));
-    emit Nonced(proofNonce);
-    // lastNonce = proofNonce;
+    lastNonce = proofNonce;
     return "";
   }
 
-  function gimme(uint256 nonce) external {
+  function gimme(uint256) external {
     require(msg.sender == getHubAddr(), "Must be called from RelayHub");
-    
-    bytes32 digest = keccak256(abi.encodePacked(_msgSender(), lastNonce, nonce, address(this)));
-    emit Proofed(uint256(digest), getDifficulty());
-
     address payable requestor = address(uint160(_msgSender()));
     requestor.transfer(GRANT);
   }
 
   function acceptRelayedCall(
     address,
-    address,
+    address from,
     bytes calldata encodedFunction,
     uint256,
     uint256,
@@ -64,7 +55,7 @@ event Nonced(uint256 nonce);
     uint256
   ) external view returns (uint256, bytes memory) {
     uint256 proofNonce = encodedFunction.readUint256(4);
-    if (this.checkProof(proofNonce)) {
+    if (checkProof(from, proofNonce)) {
       return _approveRelayedCall(abi.encodePacked(proofNonce));
     } else {
       return _rejectRelayedCall(NOT_ENOUGH_WORK);

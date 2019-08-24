@@ -26,9 +26,11 @@ class GSNFaucetProvider {
   send(payload, callback) {
     switch (payload.method) {
       case "eth_sendTransaction":
-        this._claimFunds(payload).then(() => {
-          this.baseSend(payload, callback);
-        });
+        this._claimFunds(payload)
+          .then(() => {
+            this.baseSend(payload, callback);
+          })
+          .catch(err => callback(err));
         break;
       default:
         this.baseSend(payload, callback);

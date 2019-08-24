@@ -19,21 +19,12 @@ async function ensureFunds(web3, txParams, faucetAddress) {
 }
 
 async function getFunds(web3, txParams, faucetAddress) {
-  const networkId = await web3.eth.net.getId();
-  console.log("NETWORK ID", networkId);
-  console.log("ADDRESS", faucetAddress);
   const gsnFaucet = new web3.eth.Contract(GSNFaucetArtifact.abi, faucetAddress);
-
   const gsnProvider = new GSNProvider(web3.currentProvider);
   gsnFaucet.setProvider(gsnProvider);
 
   const work = await getWork(gsnFaucet, txParams.from);
-  const tx = await gsnFaucet.methods.gimme(work).send({ from: txParams.from });
-  console.log(tx);
-  console.log(tx.logs);
-  console.log(tx.events);
-
-  console.log("GOT FUNDS!");
+  await gsnFaucet.methods.gimme(work).send({ from: txParams.from });
 }
 
 async function getWork(gsnFaucet, from) {
@@ -45,43 +36,23 @@ async function getWork(gsnFaucet, from) {
     difficulty,
     gsnFaucet.options.address
   );
-  console.log("FOUND NONCE", nonce);
   return nonce;
 }
 
 function calculateWork(sender, lastNonce, difficulty, address) {
   let nonce = 0;
-  console.log("LAST NONCE", lastNonce.toString());
-  console.log("DIFFICULTY", difficulty.toString(16));
-  console.log("SENDER", sender.toString());
-  console.log("ADDRESS", address.toString());
 
   while (true) {
-    const hash = BN(
-      soliditySha3(
-        { type: "address", value: sender },
-        { type: "uint256", value: lastNonce.toString() },
-        { type: "uint256", value: nonce.toString() },
-        { type: "address", value: address }
-      )
+    const rawHash = soliditySha3(
+      { type: "address", value: sender },
+      { type: "uint256", value: lastNonce.toString() },
+      { type: "uint256", value: nonce.toString() },
+      { type: "address", value: address }
     );
 
-    console.log(
-      "RAW",
-      soliditySha3(
-        { type: "address", value: sender },
-        { type: "uint256", value: lastNonce.toString() },
-        { type: "uint256", value: nonce.toString() },
-        { type: "address", value: address }
-      )
-    );
-
-    console.log("HASH", hash.toString(16));
+    const hash = BN(rawHash);
 
     if (hash.lt(difficulty)) {
-      console.log("GOAL");
-      console.log("HASH", hash.toString(16));
-      console.log("DIFF", difficulty.toString(16));
       return nonce;
     }
     nonce++;

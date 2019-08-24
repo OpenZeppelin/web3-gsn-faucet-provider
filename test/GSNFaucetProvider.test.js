@@ -11,11 +11,9 @@ describe.only("GSNFaucetProvider class", function() {
     this.sender = accounts[1];
     this.signer = accounts[2];
     this.empty = accounts[10];
-    console.log("DEPLOYING");
+
     this.fooBar = await deployFooBar();
-    console.log("DEPLOYED FOOBAR");
     this.faucet = await deployGSNFaucet();
-    console.log("DEPLOYED");
   });
 
   it("gets a grant and sends a transaction using it", async function() {
@@ -24,14 +22,6 @@ describe.only("GSNFaucetProvider class", function() {
         faucetAddress: this.faucet.options.address
       })
     );
-    const tx = await this.fooBar.methods.foo().send({ from: this.empty });
-    // console.log(tx)
-    // console.log(tx.logs)
-    // console.log(tx.events)
-
-    // const r = await web3.eth.getTransactionReceipt(tx.transactionHash);
-    // console.log(r);
-    // console.log(r.logs);
-    // console.log(r.events);
+    await this.fooBar.methods.foo().send({ from: this.empty });
   });
 });
