@@ -9,7 +9,7 @@ contract GSNFaucet is Initializable, GSNRecipient {
 
   uint256 public constant NOT_ENOUGH_WORK = 11;
   uint256 public constant STIPEND = 1e17;
-  
+
   uint256 private difficulty;
   uint256 private lastNonce = 0;
 
@@ -27,7 +27,7 @@ contract GSNFaucet is Initializable, GSNRecipient {
   }
 
   function checkProof(uint256 nonce) public view returns (bool) {
-    bytes32 digest = keccak256(abi.encodePacked(_msgSender(), lastNonce, nonce));
+    bytes32 digest = keccak256(abi.encodePacked(_msgSender(), lastNonce, nonce, address(this)));
     return uint256(digest) < getDifficulty();
   }
 
