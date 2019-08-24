@@ -8,7 +8,7 @@ contract GSNFaucet is Initializable, GSNRecipient {
   using LibBytes for bytes;
 
   uint256 public constant NOT_ENOUGH_WORK = 11;
-  uint256 public constant STIPEND = 1e17;
+  uint256 public constant GRANT = 1e17;
 
   uint256 private difficulty;
   uint256 private lastNonce = 0;
@@ -40,7 +40,7 @@ contract GSNFaucet is Initializable, GSNRecipient {
   function gimme(uint256) external {
     require(msg.sender == getHubAddr(), "Must be called from RelayHub");
     address payable requestor = address(uint160(_msgSender()));
-    requestor.transfer(STIPEND);
+    requestor.transfer(GRANT);
   }
 
   function acceptRelayedCall(
