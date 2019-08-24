@@ -5,6 +5,11 @@ const {
   bytecode: GSNFaucetBytecode
 } = require("../build/contracts/GSNFaucet.json");
 
+const {
+  abi: FooBarAbi,
+  bytecode: FooBarBytecode
+} = require("./build/contracts/FooBar.json");
+
 const PROVIDER_URL = process.env.PROVIDER_URL || "http://localhost:9545";
 
 async function setupAccounts() {
@@ -16,6 +21,13 @@ async function setupAccounts() {
   this.deployer = accounts[0];
 
   return accounts;
+}
+
+async function deployFooBar() {
+  const FooBar = new this.web3.eth.Contract(FooBarAbi, null, {
+    data: FooBarBytecode
+  });
+  return await FooBar.deploy().send({ from: this.deployer, gas: 2e6 });
 }
 
 async function deployGSNFaucet() {
@@ -34,5 +46,6 @@ async function deployGSNFaucet() {
 
 module.exports = {
   setupAccounts,
-  deployGSNFaucet
+  deployGSNFaucet,
+  deployFooBar
 };
